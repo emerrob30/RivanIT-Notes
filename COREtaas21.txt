@@ -1,0 +1,131 @@
+Telnet
+
+Corebaba21/D2 - gi0/1 10.21.21.4
+CUCM-21 - Fa 0/0 10.21.100.8
+EDGE-21 - 
+Gi 0/0/1 - 200.0.0.21 - telnet
+
+
+config t
+   hostname COREtaas21
+   enable secret pass
+   service password-encryption
+   no logging console
+   no ip domain-lookup
+   line console 0
+     password pass
+     login
+     exec-timeout 0 0
+    line vty 0 14
+      password pass
+      login
+      exec-timeout 0 0
+   
+   Int Vlan 1
+     no shutdown
+	 ip add 10.21.1.2 255.255.255.0
+	 description MGMTDATA
+   Int Vlan 10
+     no shutdown
+	 ip add 10.21.10.2 255.255.255.0
+	 description WIRELESS
+   Int Vlan 50
+     no shutdown
+	 ip add 10.21.50.2 255.255.255.0
+	 description IPCCTV
+   Int Vlan 100
+     no shutdown
+	 ip add 10.21.100.2 255.255.255.0
+	 description VOICEVLAN
+
+no logging console
+
+===========================================
+
+Data Plane - ping, data, voice/data call
+Control Plane - routing protocol
+Management Plane - GUI based config
+Orchestration Plane - SDWAN or similar to Maestro
+
+==========================
+
+Exercise: 
+
+D1/CoreTaas
+
+conf t
+hostname D1
+no logging console
+no ip domain-lookup
+spanning-tree vlan 1-100 root primary
+end
+
+
+D2/CoreBaba
+
+conf t
+hostname D2
+no logging console
+no ip domain-lookup
+spanning-tree vlan 1-100 root secondary
+end 
+
+======================
+CoreTaas / CoreBaba
+conf t
+int range fa0/10-12
+switchport trunk encapsulation dot1q 
+switchport mode trunk 
+
+
+D1
+conf t
+int range e1/2-3
+switchport trunk encapsulation dot1q 
+switchport mode trunk 
+
+
+D2
+conf t
+int range e1/2-3
+switchport trunk encapsulation dot1q 
+switchport mode trunk 
+
+D1
+conf t 
+vlan 2
+name CheckMe
+
+
+D1 (RST)
+EIGRP
+
+conf t
+router eigrp CCNPENARSI
+address-family ipv4 unicast autonomous-system 100
+network 10.1.4.4 0.0.0.3
+network 10.2.1.0 0.0.0.255
+network 10.2.2.0 0.0.0.255
+network 192.168.1.128 0.0.0.31
+
+D2 (RST)
+
+conf t
+router eigrp CCNPENARSI
+address-family ipv4 unicast autonomous-system 100
+network 10.1.4.8 0.0.0.3
+network 10.2.1.0 0.0.0.255
+network 10.2.2.0 0.0.0.255
+network 192.168.1.128 0.0.0.31
+
+
+
+
+
+
+
+
+
+
+
+
